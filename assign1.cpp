@@ -9,33 +9,74 @@
 #include <stdlib.h>
 #pragma warning(disable: 4996)
 
+#define NUM_ELEMENTS 20
+
 int main(void)
 {
-    char tester[10] = { 0 };
-	char newTest[10] = { 0 };
-	char bruh[11] = { 0 };
+    char userInput[NUM_ELEMENTS] = { 0 };
+
+    //should it be case sensitive? ends when user enters X
+    while (strcmpi(userInput, "X") != 0)
+    {
+        printf("Enter Student's Grade(s) >>> ");
+        fgets(userInput, NUM_ELEMENTS, stdin);
+        
+        //remove newline
+        size_t length = strlen(userInput);
+        if (userInput[length - 1] == '\n')
+        {
+            userInput[length - 1] = '\0';
+        }
+
+        //do i need to check if userInput is X?
+
+        //now check if the user entered a file
+        size_t fileMode = 0;
+        char fileName[NUM_ELEMENTS] = { 0 }; 
+        if (strcspn(userInput, "Z") == fileMode)
+        {
+            int numParse = sscanf(userInput, "%*s %s", fileName);
+            //magic number, do i need error codes?
+            if (numParse == 0)
+            {
+                printf("Error Parsing File Name\n");
+            }
+
+            FILE* pInputTestFile = NULL;
+            if ((pInputTestFile = fopen(fileName, "r")) == NULL)
+            {
+                printf("Cannot open file %s", fileName);
+                continue;
+            }
+
+            while (fgets(userInput, NUM_ELEMENTS, pInputTestFile) != NULL)
+            {
+                //parse the input
+                //the send the input to the assessGrade functions
+            }
+
+            //go back and check if these are the right functions to use in the case of error
+            if (ferror(pInputTestFile))
+            {
+                printf("Error Reading %s\n", fileName);
+                continue;
+            }
+            if (fclose(pInputTestFile) == EOF)
+            {
+                printf("Error Closing %s\n", fileName);
+                continue;
+            }
+            clearerr(pInputTestFile);
+        }
+
+        //begin file i/o
 
 
-	fgets(tester, 9, stdin);
 
-	size_t length = strlen(tester);
 
-	//use the length (of string) - 1 to index the last element of the string
-	if (tester[length - 1] == '\n')
-	{
-		tester[length - 1] = '\0';
-	}
+    }
 
-	int num = sscanf_s(tester, "%s %s", &newTest, (unsigned)sizeof(newTest), &bruh, (unsigned)sizeof(bruh));
 
-	printf("you entered %s \n", newTest);
-
-	//const char* FUCK = newTest;
-
-	if (strcmp(newTest, "Z") == 0)
-	{
-		printf("tester is Z\n");
-	}
 
 	return 0;
 
