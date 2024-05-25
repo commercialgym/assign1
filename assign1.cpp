@@ -22,11 +22,16 @@ int main(void)
     //variables in the case of user choosing to enter a file
     char fileName[NUM_CHARS] = { 0 };
 
-    //could use strcmpi to make it case insensitive
-    while (strcmp(userInput, "X") != 0)
+    //could use a different infinite condition like while true... but I will leave it like this for fun
+    while (strcmp(userInput, "X") != kEqual)
     {
         printf("Enter Student's Grade(s) >>> ");
         fgets(userInput, NUM_CHARS, stdin);
+        
+        if (strcmp(userInput, "X\n") == kEqual)
+        {
+            return SUCCESS;
+        }
 
         /*strcspn returns num of chars up until a specific character. if the first char is Z, the
         num of characters should be zero, the value of kFileMode*/
