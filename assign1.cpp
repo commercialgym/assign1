@@ -4,11 +4,7 @@
     type of user input
 */
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
 #include "assessGrade.h"
-#pragma warning(disable: 4996)
 
 
 int main(void)
@@ -17,24 +13,15 @@ int main(void)
     //variables in the case of user choosing to enter a file
     size_t fileMode = 0;
     char fileName[NUM_CHARS] = { 0 };
-    int retCode = 0;
     double finalGrade = 0;
     int numParse = 0;
+    int retCode = 0;
 
     //should it be case sensitive? ends when user enters X
     while (strcmpi(userInput, "X") != 0)
     {
         printf("Enter Student's Grade(s) >>> ");
         fgets(userInput, NUM_CHARS, stdin);
-        
-        //remove newline
-        size_t length = strlen(userInput);
-        if (userInput[length - 1] == '\n')
-        {
-            userInput[length - 1] = '\0';
-        }
-
-        //do i need to check if userInput is X?
 
         //now check if the user entered a file 
         if (strcspn(userInput, "Z") == fileMode)
@@ -45,40 +32,33 @@ int main(void)
             {
                 //printf("Error Parsing File Name\n");
                 printf("**FILE I/O ERROR\n");
+                continue;
             }
 
             FILE* pInputTestFile = NULL;
             if ((pInputTestFile = fopen(fileName, "r")) == NULL)
             {
                 printf("**FILE I/O ERROR\n");
+                //for all file i/o errors it's continue (not return) since we don't want the entire program to stop
                 continue;
             }
 
             //should I create a new variable for this ? i would have to change while condition
             while (fgets(userInput, NUM_CHARS, pInputTestFile) != NULL)
             {
-                retCode = parseUserInput(userInput);
-                //need to parse to float in order to print their grade
-                numParse = sscanf(userInput, "%lf", &finalGrade); // come back to change return code for this
-                if (retCode == ERROR)
+                /*
+                * Reason for IS_X is due to file i/o not accepting X as a valid input. Previously in assessGrade(char*),
+                * i had it return SUCCESS if the letterGrade matched "X", reading from file didn't allow userInput in main to recieve 
+                * the letter update since it's stuck in a while loop.
+                */
+                if (parseUserInput(userInput) == IS_X)
                 {
-                    printf("**ERROR : Invalid Input\n");
-                }
-                if (retCode == PASS)
-                {
-                    printf("Student Achieved %.2f %% which is a PASS condition.\n", finalGrade);
-                }
-                if (retCode == FAIL)
-                {
-                    printf("Student Achieved %.2f %% which is a FAIL condition.\n", finalGrade);
-                }
-                if (retCode == SPECIAL_CASE)
-                {
-                    printf("Student has Special Situation : %s\n", userInput);
+                    return SUCCESS;
                 }
             }
 
-            //go back and check if these are the right functions to use in the case of error
+            //check for error after exiting the while loop, checks if there
+            //was an error reading from the file
             if (ferror(pInputTestFile))
             {
                 printf("**FILE I/O ERROR\n");
@@ -89,34 +69,16 @@ int main(void)
                 printf("**FILE I/O ERROR\n");
                 continue;
             }
+            //just in case
             clearerr(pInputTestFile);
         }
 
-        //repeat of above
-        retCode = parseUserInput(userInput);
-        //need to parse to float in order to print their grade
-        numParse = sscanf(userInput, "%lf", &finalGrade); // come back to return code for this
-        if (retCode == ERROR)
-        {
-            printf("**ERROR : Invalid Input\n");
-        }
-        if (retCode == PASS)
-        {
-            printf("Student Achieved %.2lf %% which is a PASS condition.\n", finalGrade);
-        }
-        if (retCode == FAIL)
-        {
-            printf("Student Achieved %.2lf %% which is a FAIL condition.\n", finalGrade);
-        }
-        if (retCode == SPECIAL_CASE)
-        {
-            printf("Student has Special Situation : %s\n", userInput);
-        }
+        //checks "grades" from stdin
+        parseUserInput(userInput);
 
     }
 
-	return 0;
-
+    return SUCCESS;
 }
 
 

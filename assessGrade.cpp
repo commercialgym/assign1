@@ -1,102 +1,97 @@
 
 #include "assessGrade.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include "assessGrade.h"
-#pragma warning(disable: 4996)
-
 
 //letter grade to be converted
 int assessGrade(char* letterGrade)
 {
 	const int kEqual = 0;
 	int gradeStatus = 0;
-	//do i need to remove a null character for lettergrade?
+
+	if (strcmp(letterGrade, "X") == kEqual)
+	{
+		return IS_X;
+	}
 	if (strcmp(letterGrade, "A+") == kEqual)
 	{
 		double gradePlusA = 95;
-		gradeStatus = assessGrade(gradePlusA);
-		strcpy(letterGrade, "95");
-		return gradeStatus;
+		assessGrade(gradePlusA);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "A") == kEqual)
 	{
 		double gradeA = 85;
-		gradeStatus = assessGrade(gradeA);
-		strcpy(letterGrade, "85");
-		return gradeStatus;
+		assessGrade(gradeA);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "B+") == kEqual)
 	{
 		double gradePlusB = 77;
-		gradeStatus = assessGrade(gradePlusB);
-		strcpy(letterGrade, "77");
-		return gradeStatus;
+		assessGrade(gradePlusB);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "B") == kEqual)
 	{
 		double gradeB = 72;
-		gradeStatus = assessGrade(gradeB);
-		strcpy(letterGrade, "72");
-		return gradeStatus;
+		assessGrade(gradeB);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "C+") == kEqual)
 	{
 		double gradePlusC = 67;
-		gradeStatus = assessGrade(gradePlusC);
-		strcpy(letterGrade, "67");
-		return gradeStatus;
+		assessGrade(gradePlusC);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "C") == kEqual)
 	{
 		double gradeC = 62;
-		gradeStatus = assessGrade(gradeC);
-		strcpy(letterGrade, "62");
-		return gradeStatus;
+		assessGrade(gradeC);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "D") == kEqual)
 	{
 		double gradeD = 57;
-		gradeStatus = assessGrade(gradeD);
-		strcpy(letterGrade, "57");
-		return gradeStatus;
+		assessGrade(gradeD);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "F") == kEqual)
 	{
 		double gradeF = 50;
-		gradeStatus = assessGrade(gradeF);
-		strcpy(letterGrade, "50");
-		return gradeStatus;
+		assessGrade(gradeF);
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "I") == kEqual)
 	{
-		strcpy(letterGrade, "I (Incomplete)");
-		return SPECIAL_CASE;
+		printf("Student has Special Situation : I (Incomplete)\n");
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "Q") == kEqual)
 	{
-		strcpy(letterGrade, "Q (Withdrawal After Drop/Refund Date)");
-		return SPECIAL_CASE;
+		printf("Student has Special Situation : Q (Withdrawal After Drop/Refund Date)\n");
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "AU") == kEqual)
 	{
-		strcpy(letterGrade, "AU (Audit Condition)");
-		return SPECIAL_CASE;
+		printf("Student has Special Situation : AU (Audit Condition)\n");
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "DNA") == kEqual)
 	{
-		strcpy(letterGrade, "DNA (Did Not Attend)");
-		return SPECIAL_CASE;
+		printf("Student has Special Situation : DNA (Did Not Attend)\n");
+		return SUCCESS;
 	}
 	if (strcmp(letterGrade, "I/P") == kEqual)
 	{
-		strcpy(letterGrade, "I/P (In Process)");
-		return SPECIAL_CASE;
+		printf("Student has Special Situation : I/P (In Process)\n");
+		return SUCCESS;
 	}
 
-	return 0;
+	else
+	{
+		printf("ERROR : Invalid Input\n");
+	}
+	//if it does not match any then there is an error
+	return ERROR;
 }
 
 
@@ -107,20 +102,40 @@ int assessGrade(char* letterGrade)
 //RETURNS: either a pass, fail, or error (meaning invalid grade)
 int assessGrade(double finalGrade)
 {
+	int gradeStatus = 0;
 	if (finalGrade >= 0.00 && finalGrade <= 100.00)
 	{
 		if (finalGrade >= 54.50)
 		{
-			return PASS;
+			gradeStatus = PASS;
 		}
 		if (finalGrade < 54.50)
 		{
-			return FAIL;
+			gradeStatus = FAIL;
 		}
 	}
+	//if it in range it means that the input was invalid
+	else
+	{
+		printf("ERROR : Invalid Input\n");
+		return ERROR;
+	}
 
-	//else means that the input was invalid
-	return ERROR;
+	if (gradeStatus == ERROR)
+	{
+		printf("**ERROR : Invalid Input\n");
+	}
+	if (gradeStatus == PASS)
+	{
+		printf("Student Achieved %.2f %% which is a PASS condition.\n", finalGrade);
+	}
+	if (gradeStatus == FAIL)
+	{
+		printf("Student Achieved %.2f %% which is a FAIL condition.\n", finalGrade);
+	}
+
+	return SUCCESS;
+
 }
 
 //list of 5 integer grades
@@ -141,54 +156,70 @@ int assessGrade(int listOfGrades[])
 		{
 			//if there is ever an input among the list that is not within range, immediately
 			//quit this function and tell the parseUserInput function that there was an invalid input
+			printf("ERROR : Invalid Input\n");
 			return ERROR;
 		}
 	}
 
 	finalGrade = (double)gradeSum / (double)numGrades;
 	//now send to worker bee to assess whether it is a pass or fail
-	gradeStatus = assessGrade(finalGrade);
+	assessGrade(finalGrade);
 
-	return gradeStatus;
+	return SUCCESS;
+
 }
 
 //intelligently parses userInput
 int parseUserInput(char* studentGrade)
 {
+	size_t length = strlen(studentGrade);
+	if (studentGrade[length - 1] == '\n')
+	{
+		studentGrade[length - 1] = '\0';
+	}
+
 	const int kMinParse = 1;
 	int retCode = 0;
 
-		//magic number / initalize to 5 zeros
+	double validInput = 0;
+	double finalGrade = 0;
+	if (sscanf(studentGrade, "%lf %lf", &finalGrade, &validInput) == kMinParse)
+	{
+		//pass to the bee worker function
+		assessGrade(finalGrade);
+		return SUCCESS;
+	}
+
+	//magic number / initalize to 5 zeros
 	int gradesList[5] = { 0 };
 	//can be from 1-5 therefore check if sscanf parses at least one
 	if (sscanf(studentGrade, "%d %d %d %d %d", &gradesList[0], &gradesList[1], &gradesList[2], &gradesList[3], &gradesList[4]) >= kMinParse)
 	{
-		retCode = assessGrade(gradesList);
-		return retCode;
+		assessGrade(gradesList);
+		return SUCCESS;
 	}
 
-	double finalGrade = 0;
-	if (sscanf(studentGrade, "%lf", &finalGrade) == kMinParse)
-	{
-		//pass to the bee worker function
-		retCode = assessGrade(finalGrade);
-		return retCode;
-	}
-
-
+	/*
+	* Checking to see if the student Grade is less than or equal to 3 because the valid letter grades
+	* never exceed 3 characters. this way, the assessGrade function that takes a char* does not have
+	* to check for every single potential error string that the user enters
+	*/
 	size_t letterGradeLen = 3;
-	size_t length = strlen(studentGrade);
+	length = strlen(studentGrade);
 	char letterGrade[NUM_CHARS] = { 0 };
 
 	if (length <= letterGradeLen)
 	{
-		//strcpy(letterGrade, studentGrade);
-		//am i passing correctly?
-		retCode = assessGrade(studentGrade);
-		return retCode;
+		if (assessGrade(studentGrade) == IS_X)
+		{
+			return IS_X;
+		}
+		return SUCCESS;
 	}
-
-	//else means user input
-	return ERROR;
+	else
+	{
+		printf("ERROR : Invalid Input\n");
+		return ERROR;
+	}
 
 }
