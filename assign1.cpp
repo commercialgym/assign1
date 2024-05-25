@@ -1,9 +1,18 @@
-/* assign1.cpp : contains the main loop requesting the user’s input, checking for
-“X” or “Z” conditions(and reading the lines in the
-    file if “Z”) and the call to parseUserInput() to determine the
-    type of user input
+/*
+* FILE : assign1.cpp
+* PROJECT : PROG1385 - A01 Overloaded Functions
+* PROGRAMMER : Alexia Tu
+* FIRST VERSION : 05/25/2024
+* DESCRIPTION : Test harness for overloaded functions assessGrade(). Takes user input from
+    * stdin or file i/o and passes it to parseUserInput which determines what type of input the user
+    * entered, then calls an assessGrade function. If the user enters X, the program exits, if they 
+    * enter Z followed by a file name, then it opens that file and passes each line read to parseUserInput.
 */
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#pragma warning(disable: 4996)
 #include "assessGrade.h"
 
 
@@ -11,24 +20,19 @@ int main(void)
 {
     char userInput[NUM_CHARS] = { 0 };
     //variables in the case of user choosing to enter a file
-    size_t fileMode = 0;
     char fileName[NUM_CHARS] = { 0 };
-    double finalGrade = 0;
-    int numParse = 0;
-    int retCode = 0;
 
-    //should it be case sensitive? ends when user enters X
-    while (strcmpi(userInput, "X") != 0)
+    //could use strcmpi to make it case insensitive
+    while (strcmp(userInput, "X") != 0)
     {
         printf("Enter Student's Grade(s) >>> ");
         fgets(userInput, NUM_CHARS, stdin);
 
-        //now check if the user entered a file 
-        if (strcspn(userInput, "Z") == fileMode)
+        /*strcspn returns num of chars up until a specific character. if the first char is Z, the
+        num of characters should be zero, the value of kFileMode*/
+        if (strcspn(userInput, "Z") == kFileMode)
         {
-            numParse = sscanf(userInput, "%*s %s", fileName);
-            //magic number, do i need error codes?
-            if (numParse == 0)
+            if (sscanf(userInput, "%*s %s", fileName) != kNumToParse)
             {
                 //printf("Error Parsing File Name\n");
                 printf("**FILE I/O ERROR\n");
@@ -43,14 +47,9 @@ int main(void)
                 continue;
             }
 
-            //should I create a new variable for this ? i would have to change while condition
             while (fgets(userInput, NUM_CHARS, pInputTestFile) != NULL)
             {
-                /*
-                * Reason for IS_X is due to file i/o not accepting X as a valid input. Previously in assessGrade(char*),
-                * i had it return SUCCESS if the letterGrade matched "X", reading from file didn't allow userInput in main to recieve 
-                * the letter update since it's stuck in a while loop.
-                */
+                //if the input file has an X, the program exits
                 if (parseUserInput(userInput) == IS_X)
                 {
                     return SUCCESS;
@@ -73,9 +72,8 @@ int main(void)
             clearerr(pInputTestFile);
         }
 
-        //checks "grades" from stdin
+        //checks values from stdin
         parseUserInput(userInput);
-
     }
 
     return SUCCESS;
